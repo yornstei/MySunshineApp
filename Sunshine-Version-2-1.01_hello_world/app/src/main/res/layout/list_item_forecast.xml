@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:minHeight="@dimen/abc_text_size_button_material"
+    android:minHeight="90dp"
     android:gravity="center_vertical"
-    android:id="@+id/list_item_forecast_view">
+    android:id="@+id/list_item_forecast_textView">
 
 </TextView>
