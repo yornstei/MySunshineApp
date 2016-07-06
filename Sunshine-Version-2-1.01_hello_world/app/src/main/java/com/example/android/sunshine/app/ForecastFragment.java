@@ -1,10 +1,14 @@
 package com.example.android.sunshine.app;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -24,6 +28,28 @@ import java.util.ArrayList;
 public class ForecastFragment extends Fragment {
 
     public ForecastFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecastfragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == R.id.action_refresh){
+            FetchWeatherTask test = new FetchWeatherTask();
+            test.execute("90036");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -56,24 +82,48 @@ public class ForecastFragment extends Fragment {
 
         return rootView;
     }
-    public class FetchWeatherTask extends AsyncTask<Void, Void, Void>{
+
+
+    public class FetchWeatherTask extends AsyncTask<String, Void, Void>{
 
 
         final private String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Void doInBackground(String... params) {
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             // Will contain the raw JSON response as a string.
             String forecastJsonStr = null;
 
+            String format = "JSON";
+            String units = "metric";
+            int cnt = 7;
+            String key = "eb3247d6ae99299a72f5ae67050e0c5a";
+
             try {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are available at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+                final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+                final String QUERY_PARAM = "q";
+                final String FORMAT_PARAM = "mode";
+                final String UNITS_PARAM = "units";
+                final String CNT_PARAM = "cnt";
+                final String KEY_PARAM = "APPID";
+
+                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
+                        .appendQueryParameter(QUERY_PARAM, params[0])
+                        .appendQueryParameter(FORMAT_PARAM,format)
+                        .appendQueryParameter(UNITS_PARAM, units)
+                        .appendQueryParameter(CNT_PARAM,Integer.toString(cnt))
+                        .appendQueryParameter(KEY_PARAM, key)
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+
+                Log.v(LOG_TAG, "bulitUri" + builtUri.toString());
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -102,6 +152,8 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+
+                Log.v(LOG_TAG,"JSON REPLY"+ forecastJsonStr);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attempting
