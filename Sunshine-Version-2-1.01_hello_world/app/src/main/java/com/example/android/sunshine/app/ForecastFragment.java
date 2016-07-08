@@ -1,9 +1,11 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -57,18 +59,30 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_refresh){
-            FetchWeatherTask test = new FetchWeatherTask();
-            test.execute("11230");
+            updateWeather();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateWeather() {
+        FetchWeatherTask test = new FetchWeatherTask();
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = pref.getString(getString(R.string.pref_key), getString(R.string.pref_defaultValue));
+        test.execute(location);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
+/*
         fakeData.add("Today-Sunny-88/63");
         fakeData.add("Tomorrow-Foggy-70/46");
         fakeData.add("Wed-Cloudy-73/63");
@@ -76,7 +90,7 @@ public class ForecastFragment extends Fragment {
         fakeData.add("Friday-Foggy-70/46");
         fakeData.add("Say-sunny-76/68");
         fakeData.add("Sun-Awesome day");
-
+*/
         myAdapt = new ArrayAdapter<String>(getActivity(),R.layout.list_item_forecast,R.id.list_item_forecast_textView,fakeData);
 
         ListView lv = (ListView) rootView.findViewById(R.id.list_view_forecast);
