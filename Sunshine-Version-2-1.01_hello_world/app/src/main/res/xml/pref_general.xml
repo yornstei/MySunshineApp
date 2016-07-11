@@ -10,4 +10,13 @@
 
     </EditTextPreference>
 
+    <ListPreference
+        android:title="@string/pref_unit_title"
+        android:key="@string/pref_unit_key"
+        android:defaultValue="@string/pref_unit_defaultvalue"
+        android:entryValues="@array/pref_units_values"
+        android:entries="@array/pref_units_options">
+
+    </ListPreference>
+
 </PreferenceScreen>

@@ -8,5 +8,12 @@
     <string name="pref_title">location</string>
     <string name="pref_key">location</string>
     <string name="pref_defaultValue">11230</string>
+    <string name="pref_unit_title">Temp Unit</string>
+    <string name="pref_unit_key">Units</string>
+    <string name="pref_unit_defaultvalue">metric</string>
+    <string name="pref_units_label_metric">Metric</string>
+    <string name="pref_units_label_imperial">Imperial</string>
+    <string name="pref_units_metric" translatable="false">metric</string>
+    <string name="pref_units_imperial" translatable="false">imperial</string>
 
 </resources>
