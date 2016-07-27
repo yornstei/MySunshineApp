@@ -2,6 +2,7 @@ package com.example.android.sunshine.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.android.sunshine.app.data.WeatherContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +45,7 @@ public class ForecastFragment extends Fragment {
     }
 
     ArrayList<String> fakeData = new ArrayList<String>();
-    ArrayAdapter<String> myAdapt;
+    ForecastAdapter myAdapt;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,9 +70,8 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather() {
-        FetchWeatherTask test = new FetchWeatherTask(getActivity(), myAdapt);
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String location = pref.getString(getString(R.string.pref_key), getString(R.string.pref_defaultValue));
+        FetchWeatherTask test = new FetchWeatherTask(getActivity());
+        String location = Utility.getPreferredLocation(getActivity());
         test.execute(location);
     }
 
@@ -92,7 +94,17 @@ public class ForecastFragment extends Fragment {
         fakeData.add("Say-sunny-76/68");
         fakeData.add("Sun-Awesome day");
 */
-        myAdapt = new ArrayAdapter<String>(getActivity(),R.layout.list_item_forecast,R.id.list_item_forecast_textView,fakeData);
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        // Sort order:  Ascending, by date.
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+
+        Cursor cur = getActivity().getContentResolver().query(weatherForLocationUri,
+                null, null, null, sortOrder);
+
+        myAdapt = new ForecastAdapter(getActivity(),cur, 0);
 
         ListView lv = (ListView) rootView.findViewById(R.id.list_view_forecast);
 

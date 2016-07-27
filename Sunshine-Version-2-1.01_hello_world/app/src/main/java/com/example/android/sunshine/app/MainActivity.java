@@ -70,8 +70,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void OpenPreferredLocationInMap() {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        String location = pref.getString(getString(R.string.pref_key), getString(R.string.pref_defaultValue));
+        String location = Utility.getPreferredLocation(this);
 
         Uri geoLocation = Uri.parse("geo:0,0?").buildUpon().appendQueryParameter("q",location).build();
 
