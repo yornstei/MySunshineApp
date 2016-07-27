@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +21,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 
@@ -39,12 +44,12 @@ import java.util.ArrayList;
 /**
  * Created by yehuda on 7/5/2016.
  */
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     public ForecastFragment() {
     }
-
-    ArrayList<String> fakeData = new ArrayList<String>();
+    private static final int FORECAST_LOADER = 0;
+    //ArrayList<String> fakeData = new ArrayList<String>();
     ForecastAdapter myAdapt;
 
     @Override
@@ -110,18 +115,44 @@ public class ForecastFragment extends Fragment {
 
         lv.setAdapter(myAdapt);
 
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String forecast = fakeData.get(i);
-                Toast.makeText(getActivity(), forecast, Toast.LENGTH_LONG).show();
-                Intent detailActivity = new Intent(getActivity(), DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT,forecast);
-                startActivity(detailActivity);
-            }
-        });
+//        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                String forecast = fakeData.get(i);
+//                Toast.makeText(getActivity(), forecast, Toast.LENGTH_LONG).show();
+//                Intent detailActivity = new Intent(getActivity(), DetailActivity.class)
+//                        .putExtra(Intent.EXTRA_TEXT,forecast);
+//                startActivity(detailActivity);
+//            }
+//        });
 
         return rootView;
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String locationSetting = Utility.getPreferredLocation(getActivity());
+
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        Uri weatherForLocationUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                locationSetting, System.currentTimeMillis());
+
+        return new CursorLoader(getActivity(),
+                weatherForLocationUri,
+                null,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        myAdapt.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        myAdapt.swapCursor(null);
     }
 
 //    public class FetchWeatherTask extends AsyncTask<String, Void, String[]>{
