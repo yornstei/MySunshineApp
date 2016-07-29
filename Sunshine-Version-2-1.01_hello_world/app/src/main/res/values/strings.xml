@@ -17,5 +17,6 @@
     <string name="pref_units_imperial" translatable="false">imperial</string>
     <string name="open_in_maps">Open in maps</string>
     <string name="action_share">share</string>
+    <string name="title_activity_detail">Details</string>
 
 </resources>
