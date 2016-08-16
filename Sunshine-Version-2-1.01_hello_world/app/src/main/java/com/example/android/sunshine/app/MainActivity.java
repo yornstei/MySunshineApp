@@ -29,6 +29,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
 
+    String mLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
